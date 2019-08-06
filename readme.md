@@ -66,3 +66,5 @@ bench run ... --warn-threshold 0.8 --fail-threshold 0.5
 ```
 
 The thresholds are a ratio you expect to meet. Setting `--warn-threshold` to `0.8` means that if performance degrades down to 80% or lower of what's recorded in the profile, that test will throw a warning.
+
+Don't set your thresholds too strictly, however. Microbenchmarks tend to give inherently variable results based on all kinds of various conditions you may not be aware of. This tool is meant as a sanity test more than anything; To catch unexpected, large shifts in relative performance.

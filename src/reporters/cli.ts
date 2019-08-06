@@ -58,24 +58,29 @@ export class CliReporter extends Reporter {
 
 		for (let i = 0; i < result.tests.length; i++) {
 			const test = result.tests[i];
+			const variance = test.expectation.raw === 0
+				? 1
+				: test.hz.raw / test.expectation.raw;
+
+			const formattedVariance = formatVariance(variance);
 
 			switch (test.outcome) {
 				case BenchmarkOutcome.Pass:
 					pass++;
 					this.pass++;
-					tests.push(green(`   - ${test.result}`));
+					tests.push(`   - ${test.result} [${green(formattedVariance)}]`);
 					break;
 
 				case BenchmarkOutcome.Warn:
 					warn++;
 					this.warn++;
-					tests.push(yellow(`   - ${test.result}`));
+					tests.push(`   - ${test.result} [${yellow(formattedVariance)}]`);
 					break;
 
 				case BenchmarkOutcome.Fail:
 					fail++;
 					this.fail++;
-					tests.push(red(`   - ${test.result}`));
+					tests.push(`   - ${test.result} [${red(formattedVariance)}]`);
 					break;
 			}
 		}
@@ -93,24 +98,29 @@ export class CliReporter extends Reporter {
 
 		for (let i = 0; i < result.tests.length; i++) {
 			const test = result.tests[i];
+			const variance = test.expectation.raw === 0
+				? 1
+				: test.hz.raw / test.expectation.raw;
+
+			const formattedVariance = formatVariance(variance);
 
 			switch (test.outcome) {
 				case BenchmarkOutcome.Pass:
 					pass++;
 					this.pass++;
-					tests.push(`   - ${test.result}`);
+					tests.push(`   - ${test.result} [${formattedVariance}]`);
 					break;
 
 				case BenchmarkOutcome.Warn:
 					warn++;
 					this.warn++;
-					tests.push(`   - ${test.result}`);
+					tests.push(`   - ${test.result} [${formattedVariance}]`);
 					break;
 
 				case BenchmarkOutcome.Fail:
 					fail++;
 					this.fail++;
-					tests.push(`   - ${test.result}`);
+					tests.push(`   - ${test.result} [${formattedVariance}]`);
 					break;
 			}
 		}
@@ -119,3 +129,10 @@ export class CliReporter extends Reporter {
 		console.log(tests.join('\n'));
 	}
 }
+
+const formatVariance = (variance: number) : string => {
+	const percent = (variance - 1) * 100;
+	const sign = percent < 0 ? '-' : '+';
+
+	return `${Math.abs(percent)}%`;
+};
