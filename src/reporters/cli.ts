@@ -134,5 +134,5 @@ const formatVariance = (variance: number) : string => {
 	const percent = (variance - 1) * 100;
 	const sign = percent < 0 ? '-' : '+';
 
-	return `${Math.abs(percent)}%`;
+	return `${Math.abs(percent).toFixed(2)}%`;
 };
