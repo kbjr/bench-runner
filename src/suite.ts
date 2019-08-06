@@ -13,6 +13,7 @@ export interface TestResult {
 	result: string;
 	hz: Stat;
 	expectation: Stat;
+	expectationVariance: Stat;
 	outcome: BenchmarkOutcome;
 	variance: Stat;
 	runsSampled: number;
@@ -67,12 +68,16 @@ export class Suite {
 
 			this.suite.on('cycle', (event) => {
 				const expectation = expectations[event.target.name] || 0;
+				const variance = expectations[event.target.name]
+					? event.target.hz / expectations[event.target.name]
+					: 1;
 
 				const testResult: TestResult = {
 					name: event.target.name,
 					result: event.target.toString(),
 					hz: formatHz(event.target.hz),
 					expectation: formatHz(expectation),
+					expectationVariance: formatHz(variance),
 					outcome: null,
 					variance: formatVariance(event.target.stats.rme),
 					runsSampled: event.target.stats.sample.length
@@ -130,5 +135,15 @@ const formatVariance = (raw: number) : Stat => {
 	return {
 		raw: raw,
 		formatted: `+/-${raw.toPrecision(3)}%`
+	};
+};
+
+const formatExpectationVariance = (variance: number) : Stat => {
+	const percent = (variance - 1) * 100;
+	const sign = percent < 0 ? '-' : '+';
+
+	return {
+		raw: percent,
+		formatted: `${Math.abs(percent).toFixed(2)}%`
 	};
 };

@@ -58,29 +58,24 @@ export class CliReporter extends Reporter {
 
 		for (let i = 0; i < result.tests.length; i++) {
 			const test = result.tests[i];
-			const variance = test.expectation.raw === 0
-				? 1
-				: test.hz.raw / test.expectation.raw;
-
-			const formattedVariance = formatVariance(variance);
 
 			switch (test.outcome) {
 				case BenchmarkOutcome.Pass:
 					pass++;
 					this.pass++;
-					tests.push(`   - ${test.result} [${green(formattedVariance)}]`);
+					tests.push(`   - ${test.result} [${green(test.expectationVariance.formatted)}]`);
 					break;
 
 				case BenchmarkOutcome.Warn:
 					warn++;
 					this.warn++;
-					tests.push(`   - ${test.result} [${yellow(formattedVariance)}]`);
+					tests.push(`   - ${test.result} [${yellow(test.expectationVariance.formatted)}]`);
 					break;
 
 				case BenchmarkOutcome.Fail:
 					fail++;
 					this.fail++;
-					tests.push(`   - ${test.result} [${red(formattedVariance)}]`);
+					tests.push(`   - ${test.result} [${red(test.expectationVariance.formatted)}]`);
 					break;
 			}
 		}
@@ -98,29 +93,24 @@ export class CliReporter extends Reporter {
 
 		for (let i = 0; i < result.tests.length; i++) {
 			const test = result.tests[i];
-			const variance = test.expectation.raw === 0
-				? 1
-				: test.hz.raw / test.expectation.raw;
-
-			const formattedVariance = formatVariance(variance);
 
 			switch (test.outcome) {
 				case BenchmarkOutcome.Pass:
 					pass++;
 					this.pass++;
-					tests.push(`   - ${test.result} [${formattedVariance}]`);
+					tests.push(`   - ${test.result} [${test.expectationVariance.formatted}]`);
 					break;
 
 				case BenchmarkOutcome.Warn:
 					warn++;
 					this.warn++;
-					tests.push(`   - ${test.result} [${formattedVariance}]`);
+					tests.push(`   - ${test.result} [${test.expectationVariance.formatted}]`);
 					break;
 
 				case BenchmarkOutcome.Fail:
 					fail++;
 					this.fail++;
-					tests.push(`   - ${test.result} [${formattedVariance}]`);
+					tests.push(`   - ${test.result} [${test.expectationVariance.formatted}]`);
 					break;
 			}
 		}
@@ -129,10 +119,3 @@ export class CliReporter extends Reporter {
 		console.log(tests.join('\n'));
 	}
 }
-
-const formatVariance = (variance: number) : string => {
-	const percent = (variance - 1) * 100;
-	const sign = percent < 0 ? '-' : '+';
-
-	return `${Math.abs(percent).toFixed(2)}%`;
-};
