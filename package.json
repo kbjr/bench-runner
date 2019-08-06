@@ -16,7 +16,7 @@
     "test"
   ],
   "author": "James Brumond <james@jbrumond.me>",
-  "license": "MIT",
+  "license": "ISC",
   "dependencies": {
     "@types/glob": "^7.1.1",
     "@types/yargs": "^13.0.2",
