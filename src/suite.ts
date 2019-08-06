@@ -144,6 +144,6 @@ const formatExpectationVariance = (variance: number) : Stat => {
 
 	return {
 		raw: percent,
-		formatted: `${Math.abs(percent).toFixed(2)}%`
+		formatted: `${sign}${Math.abs(percent).toFixed(2)}%`
 	};
 };
