@@ -1,6 +1,6 @@
 {
   "name": "@k/bench-runner",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A simple benchmark runner with reporting",
   "main": "build/index.js",
   "scripts": {
