@@ -8,12 +8,8 @@ A simple benchmark runner with reporting.
 #### CLI Usage
 
 ```
-bench [options]                                                                                                                                                               
+bench run [options]
 Runs your benchmark suite
-
-Commands:
-  bench [options]     Runs your benchmark suite                                                                [default]
-  bench completion    generate completion script
 
 Options:
   --version         Show version number                                                                        [boolean]
