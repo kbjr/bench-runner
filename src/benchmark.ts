@@ -1,7 +1,7 @@
 
 import { Config } from './config';
 import { Profile } from './profile';
-import { Suite } from './suite';
+import { Suite, BenchmarkOutcome } from './suite';
 import { Reporter } from './reporters/reporter';
 import { sync as glob } from 'glob';
 import { resolve } from 'path';
@@ -15,6 +15,7 @@ export class Benchmark {
 	public readonly profile: Profile;
 	public readonly suites: Suite[] = [ ];
 	public readonly reporters: Reporter[];
+	public outcome: BenchmarkOutcome = BenchmarkOutcome.None;
 
 	constructor(config: Config) {
 		this.config = config;
@@ -60,6 +61,10 @@ export class Benchmark {
 		for (let i = 0; i < this.suites.length; i++) {
 			const suite = this.suites[i];
 			const result = await suite.run();
+
+			if (result.outcome > this.outcome) {
+				this.outcome = result.outcome;
+			}
 
 			this.reporters.forEach((reporter) => {
 				reporter.write(result);

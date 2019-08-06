@@ -1,7 +1,7 @@
 
 import * as yargs from 'yargs';
 import { Argv, CommandModule, CommandBuilder, Arguments } from 'yargs';
-import { Benchmark, Suite, CliReporter, Config, ReporterConstructor, SuiteTests } from './index';
+import { Benchmark, Suite, CliReporter, Config, ReporterConstructor, SuiteTests, BenchmarkOutcome } from './index';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
@@ -106,6 +106,14 @@ const handler = async (args: Arguments<Options>) => {
 	};
 
 	await benchmark.run();
+
+	if (benchmark.outcome === BenchmarkOutcome.Fail) {
+		process.exit(1);
+	}
+
+	else {
+		process.exit(0);
+	}
 };
 
 const getReporterFromConfig = (reporter: string | [ string, object ]) : [ ReporterConstructor, object ] => {

@@ -2,9 +2,10 @@
 import { Suite as BenchmarkSuite } from 'benchmark';
 
 export enum BenchmarkOutcome {
+	None = -1,
 	Pass,
-	Fail,
-	Warn
+	Warn,
+	Fail
 }
 
 export interface TestResult {
