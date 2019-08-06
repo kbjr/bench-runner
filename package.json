@@ -2,7 +2,7 @@
   "name": "@k/bench-runner",
   "version": "1.0.2",
   "description": "A simple benchmark runner with reporting",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
     "build": "tsc --build tsconfig.json"
   },
