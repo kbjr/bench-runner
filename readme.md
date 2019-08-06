@@ -44,3 +44,25 @@ Options:
 	"profile": "your-performance.bench-profile.json"
 }
 ```
+
+#### Building and Using Profiles
+
+Building a profile is as easy as passing in an extra option when running your benchmarks
+
+```bash
+bench run ... --profile-out your-profile.json
+```
+
+This will create a new file `your-profile.json` containing your benchmark profile. You can then compare later runs against this profile by passing the file back in with the `profile` option.
+
+```bash
+bench run ... --profile your-profile.json
+```
+
+These later runs will compare the new performance against the expectations set in the profile, and if they vary too much, it will throw out a warning or an error. You can control how much variance to allow by setting the threshold options
+
+```bash
+bench run ... --warn-threshold 0.8 --fail-threshold 0.5
+```
+
+The thresholds are a ratio you expect to meet. Setting `--warn-threshold` to `0.8` means that if performance degrades down to 80% or lower of what's recorded in the profile, that test will throw a warning.
