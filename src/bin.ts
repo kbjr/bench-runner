@@ -136,7 +136,7 @@ const getReporterFromConfig = (reporter: string | [ string, object ]) : [ Report
 
 yargs
 	.scriptName('bench')
-	.command('$0 [options]', 'Runs your benchmark suite', { handler, builder })
+	.command('run [options]', 'Runs your benchmark suite', { handler, builder })
 	.help()
 	.completion('completion')
 	.wrap(Math.min(yargs.terminalWidth(), 120))
