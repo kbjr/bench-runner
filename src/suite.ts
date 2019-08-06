@@ -77,7 +77,7 @@ export class Suite {
 					result: event.target.toString(),
 					hz: formatHz(event.target.hz),
 					expectation: formatHz(expectation),
-					expectationVariance: formatHz(variance),
+					expectationVariance: formatExpectationVariance(variance),
 					outcome: null,
 					variance: formatVariance(event.target.stats.rme),
 					runsSampled: event.target.stats.sample.length
