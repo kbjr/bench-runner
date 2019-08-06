@@ -1,7 +1,7 @@
 
-import { readFileSync } from 'fs';
-import { SuiteResult } from './suite';
+import { readFileSync, writeFileSync } from 'fs';
 import { nodeVersion, os, memory, cpuDesc } from './platform';
+import { SuiteResult } from './suite';
 
 export interface ProfileData {
 	os: string;
@@ -82,5 +82,11 @@ export class Profile {
 		};
 
 		return JSON.stringify(data, null, '  ');
+	}
+
+	writeToFile(file: string) {
+		const contents = this.getJSON();
+
+		writeFileSync(file, file, 'utf8');
 	}
 }

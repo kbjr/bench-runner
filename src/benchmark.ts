@@ -13,6 +13,7 @@ export interface SuiteTests {
 export class Benchmark {
 	public readonly config: Config;
 	public readonly profile: Profile;
+	public readonly newProfile: Profile;
 	public readonly suites: Suite[] = [ ];
 	public readonly reporters: Reporter[];
 	public outcome: BenchmarkOutcome = BenchmarkOutcome.None;
@@ -22,6 +23,10 @@ export class Benchmark {
 		this.profile = config.profile
 			? Profile.readFromFile(config.profile)
 			: Profile.create();
+
+		if (config.profileOut) {
+			this.newProfile = Profile.create();
+		}
 
 		this.reporters = this.config.reporters.map((reporter) => {
 			if (Array.isArray(reporter)) {
@@ -66,6 +71,10 @@ export class Benchmark {
 				this.outcome = result.outcome;
 			}
 
+			if (this.newProfile) {
+				this.newProfile.updateSuite(result);
+			}
+
 			this.reporters.forEach((reporter) => {
 				reporter.write(result);
 			});
@@ -74,6 +83,10 @@ export class Benchmark {
 		this.reporters.forEach((reporter) => {
 			reporter.end();
 		});
+
+		if (this.newProfile) {
+			this.newProfile.writeToFile(resolve(process.cwd(), this.config.profileOut));
+		}
 	}
 }
 
