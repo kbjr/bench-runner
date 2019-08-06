@@ -87,6 +87,6 @@ export class Profile {
 	writeToFile(file: string) {
 		const contents = this.getJSON();
 
-		writeFileSync(file, file, 'utf8');
+		writeFileSync(file, contents, 'utf8');
 	}
 }
