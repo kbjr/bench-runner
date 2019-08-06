@@ -5,6 +5,10 @@ A simple benchmark runner with reporting.
 - Build a profile of your code's performance
 - Run your benchmarks again as you change your code and have automatic reporting about when your performance shifts
 
+```bash
+$ npm install @k/bench-runner
+```
+
 #### CLI Usage
 
 ```
