@@ -89,13 +89,14 @@ const handler = async (args: Arguments<Options>) => {
 	config.failThreshold = args.failThreshold || configFile.failThreshold || 0.5;
 	config.reporters = (args.reporters || configFile.reporters || [ 'cli' ]).map(getReporterFromConfig);
 	config.profile = args.profile || configFile.profile || null;
-	config.profileOut = args.profileOut || config.profileOut || null;
+	config.profileOut = args.profileOut || configFile.profileOut || null;
 
 	const benchmark = new Benchmark(config);
 
 	requireFiles(args.require);
 	requireFiles(configFile.require);
 
+	// Bind the `suite` shortcut method into the library so test files can access it
 	require('./index').suite = (name: string, tests: SuiteTests) => {
 		benchmark.add(name, tests);
 	};
