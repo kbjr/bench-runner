@@ -29,25 +29,45 @@ Options:
   --profile-out     If set, will additionally output a new benchmark profile to this file                       [string]
   ```
 
-#### Example Config File
+#### Example
+
+You can see an example of what a benchmark looks like by looking in the [example](https://github.com/kbjr/bench-runner/tree/master/example) directory. The `.bench-config.json` file contains the configuration for the benchmark, and looks like this:
 
 ```json
 {
 	"name": "Example Benchmark",
-	"files": "src/**/*.bench.js",
+	"files": "example/**/*.js",
 	"warnThreshold": 0.8,
 	"failThreshold": 0.5,
 	"reporters": [
 		["cli", {
 			"colors": true
 		}]
-	],
-	"require": [
-		"some-module/to-require"
-	],
-	"profile": "your-performance.bench-profile.json"
+	]
 }
 ```
+
+Running the benchmark can be done by with `bench run --config ./example/.bench-config.json`. You should see output something like this:
+
+```
+
+  Example Benchmark
+  =================
+
+  Suite: Array.forEach (2 pass, 0 warn, 0 fail)
+   - Small Array (1000) x 1,903,577 ops/sec ±62.35% (88 runs sampled) [+0.00%]
+   - Large Array (1000000) x 87.92 ops/sec ±0.38% (75 runs sampled) [+0.00%]
+
+  Suite: Array.map (2 pass, 0 warn, 0 fail)
+   - Small Array (1000) x 371,231 ops/sec ±8.71% (97 runs sampled) [+0.00%]
+   - Large Array (1000000) x 63.38 ops/sec ±0.14% (65 runs sampled) [+0.00%]
+
+  Benchmark Complete
+  4 pass, 0 warn, 0 fail
+
+```
+
+Because this isn't running against an existing profile, every test passes. You can see the `[+0.00%]` on the end of each line. That's where the variance against your previous profile would normally show up. To get the real benefit though, we need a profile to compare against.
 
 #### Building and Using Profiles
 
