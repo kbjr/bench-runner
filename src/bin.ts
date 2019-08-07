@@ -93,13 +93,8 @@ const handler = async (args: Arguments<Options>) => {
 
 	const benchmark = new Benchmark(config);
 
-	if (args.require) {
-		args.require.forEach((file) => require(file));
-	}
-
-	if (configFile.require) {
-		configFile.require.forEach((file) => require(file));
-	}
+	requireFiles(args.require);
+	requireFiles(configFile.require);
 
 	require('./index').suite = (name: string, tests: SuiteTests) => {
 		benchmark.add(name, tests);
@@ -140,6 +135,21 @@ const getReporterFromConfig = (reporter: string | [ string, object ]) : [ Report
 	}
 
 	throw new Error('Invalid value for reporter in config');
+};
+
+const requireFiles = (files: string[]) => {
+	if (Array.isArray(files)) {
+		files.forEach((file) => {
+			// For relative file paths, we resolve them relative to cwd
+			if (file.indexOf('./') === 0 || file.indexOf('../') === 0) {
+				require(resolve(process.cwd(), file));
+			}
+
+			else {
+				require(file);
+			}
+		});
+	}
 };
 
 yargs
