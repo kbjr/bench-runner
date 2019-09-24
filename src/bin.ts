@@ -1,9 +1,21 @@
 
 import * as yargs from 'yargs';
 import { Argv, CommandModule, CommandBuilder, Arguments } from 'yargs';
-import { Benchmark, Suite, CliReporter, Config, ReporterConstructor, SuiteTests, BenchmarkOutcome } from './index';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import {
+	Benchmark,
+	Suite,
+	CliReporter,
+	Config,
+	ReporterConstructor,
+	SuiteTests,
+	BenchmarkOutcome,
+	BeforeCallback,
+	DefineSuiteCallback,
+	TestCallback,
+	DefineTestOptions
+} from './index';
 
 interface Options {
 	config?: string;
@@ -96,9 +108,49 @@ const handler = async (args: Arguments<Options>) => {
 	requireFiles(args.require);
 	requireFiles(configFile.require);
 
+	const module = require('./index');
+
+	let currentSuite: Suite;
+
 	// Bind the `suite` shortcut method into the library so test files can access it
-	require('./index').suite = (name: string, tests: SuiteTests) => {
-		benchmark.add(name, tests);
+	module.suite = (name: string, tests: SuiteTests | DefineSuiteCallback) => {
+		if (typeof tests === 'function') {
+			currentSuite = benchmark.add(name, { });
+
+			tests();
+
+			currentSuite = null;
+		}
+
+		else {
+			benchmark.add(name, tests as SuiteTests);
+		}
+	};
+
+	module.suite.test = <D>(name: string, test: TestCallback<void> | DefineTestOptions<D>) => {
+		if (! currentSuite) {
+			throw new Error('suite.test can only be called from inside a suite definition');
+		}
+
+		if (typeof test === 'function') {
+			currentSuite.add(name, test);
+		}
+
+		else {
+			currentSuite.add(name, test.test, {
+				before: test.before,
+				generateData: test.generateData,
+				generateDataArray: test.generateDataArray
+			});
+		}
+	};
+
+	module.suite.before = (callback: BeforeCallback) => {
+		if (! currentSuite) {
+			throw new Error('suite.before can only be called from inside a suite definition');
+		}
+
+		currentSuite.before(callback);
 	};
 
 	await benchmark.run();

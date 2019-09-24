@@ -1,6 +1,8 @@
 
 import { Suite as BenchmarkSuite } from 'benchmark';
 
+const dataSampleSize = 100;
+
 export enum BenchmarkOutcome {
 	None = -1,
 	Pass,
@@ -38,10 +40,44 @@ export interface SuiteConfig {
 	}
 }
 
+export interface TestCallback<D> {
+	(data?: D): void;
+
+	/** Internal function stored on the test function */
+	before?: Function;
+
+	/** Internal function stored on the test function */
+	generateData?: Function;
+}
+
+export interface BeforeCallback {
+	(): void | Promise<void>;
+}
+
+export interface BeforeTestCallback {
+	(): void;
+}
+
+export interface GenerateTestDataCallback<D> {
+	(): D;
+}
+
+export interface GenerateTestDataArrayCallback<D> {
+	(): D[];
+}
+
+export interface TestOptions<D> {
+	before?: BeforeTestCallback;
+	generateData?: GenerateTestDataCallback<D>;
+	generateDataArray?: GenerateTestDataArrayCallback<D>;
+}
+
 export class Suite {
 	public readonly name: string;
 	public readonly suite: BenchmarkSuite;
 	public readonly config: SuiteConfig;
+	public readonly beforeCallbacks: BeforeCallback[] = [ ];
+	public readonly dataGenerators: Function[] = [ ];
 
 	constructor(name: string, config: SuiteConfig) {
 		this.name = name;
@@ -49,12 +85,22 @@ export class Suite {
 		this.config = config;
 	}
 
-	add(name: string, callback: () => void) : void {
-		this.suite.add(name, callback);
+	add<D>(name: string, callback: TestCallback<D>, opts?: TestOptions<D>) : void {
+		const wrapped = wrapCallback(callback, opts);
+
+		if (wrapped.generateData) {
+			this.dataGenerators.push(wrapped.generateData);
+		}
+
+		this.suite.add(name, wrapped);
+	}
+
+	before(callback: BeforeCallback) : void {
+		this.beforeCallbacks.push(callback);
 	}
 
 	run() : Promise<SuiteResult> {
-		return new Promise((resolve) => {
+		return new Promise(async (resolve) => {
 			const result: SuiteResult = {
 				name: this.name,
 				tests: [ ],
@@ -65,6 +111,16 @@ export class Suite {
 
 			let hasWarn = false;
 			let hasFail = false;
+
+			// Call any global before callbacks
+			for (let i = 0; i < this.beforeCallbacks.length; i++) {
+				await this.beforeCallbacks[i]();
+			}
+
+			// Call any data generators
+			for (let i = 0; i < this.dataGenerators.length; i++) {
+				this.dataGenerators[i]();
+			}
 
 			this.suite.on('cycle', (event) => {
 				const expectation = expectations[event.target.name] || 0;
@@ -146,4 +202,87 @@ const formatExpectationVariance = (variance: number) : Stat => {
 		raw: percent,
 		formatted: `${sign}${Math.abs(percent).toFixed(2)}%`
 	};
+};
+
+/**
+ * Wraps a test callback to enable support for `before` and `generateData` callbacks
+ */
+const wrapCallback = <D>(callback: TestCallback<D>, opts: TestOptions<D>) : TestCallback<void> => {
+	if (! opts || ! opts.before && ! opts.generateData && ! opts.generateDataArray) {
+		return callback as any;
+	}
+
+	let data: D[];
+	let dataIndex = 0;
+	let wrapped: TestCallback<void>;
+	let callbackWithData: TestCallback<void>;
+	let result: TestCallback<void> = () => wrapped();
+
+	// First, handle any data generation by defining the `reuslt.generateData` method to
+	// handle whichever data generator is available
+
+	if (opts.generateDataArray) {
+		result.generateData = () => {
+			data = opts.generateDataArray();
+		};
+			
+		callbackWithData = () => {
+			callback(data[dataIndex]);
+
+			if (dataIndex >= data.length) {
+				dataIndex = 0;
+			}
+		};
+	}
+
+	else if (opts.generateData) {
+		data = new Array(dataSampleSize);
+
+		result.generateData = () => {
+			for (let i = 0; i < dataSampleSize; i++) {
+				data[i] = opts.generateData();
+			}
+		};
+
+		callbackWithData = () => {
+			callback(data[dataIndex]);
+
+			if (dataIndex >= dataSampleSize) {
+				dataIndex = 0;
+			}
+		};
+	}
+
+	// Bind the before function is needed
+
+	if (opts.before) {
+		if (result.generateData) {
+			wrapped = () => {
+				// We only want to call before once, so after the first call, we immediately replace the
+				// wrapped callback with one that doesn't call before
+				wrapped = callbackWithData;
+
+				opts.before();
+				callbackWithData();
+			};
+		}
+
+		else {
+			wrapped = () => {
+				// We only want to call before once, so after the first call, we immediately replace the
+				// wrapped callback with one that doesn't call before
+				wrapped = callback as any;
+
+				opts.before();
+			};
+		}
+	}
+
+	// Otherwise our wrapped function is just the function that selects from data
+
+	else {
+		wrapped = callbackWithData;
+	}
+
+	return result;
 };

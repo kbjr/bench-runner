@@ -53,6 +53,8 @@ export class Benchmark {
 		});
 
 		this.suites.push(suite);
+
+		return suite;
 	}
 
 	async run() : Promise<void> {

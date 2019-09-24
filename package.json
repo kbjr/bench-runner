@@ -4,7 +4,8 @@
   "description": "A simple benchmark runner with reporting",
   "main": "build/index.js",
   "scripts": {
-    "build": "tsc --build tsconfig.json"
+    "build": "tsc --build tsconfig.json",
+    "example": "node ./build/bin.js run --config ./example/.bench-config.json"
   },
   "bin": {
     "bench": "bin/bench"
