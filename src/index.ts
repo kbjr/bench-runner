@@ -63,7 +63,7 @@ export interface DefineSuite {
 	/**
 	 * Adds a new test to the suite currently being defined
 	 */
-	test(callback: TestCallback<void> | DefineTestOptions<any>): void;
+	test(name: string, test: TestCallback<void> | DefineTestOptions<any>): void;
 }
 
 export let suite: DefineSuite;
