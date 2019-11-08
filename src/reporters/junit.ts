@@ -43,7 +43,7 @@ export class JunitReporter extends Reporter {
 	end() : Promise<void> {
 		const count = this.pass + this.warn + this.fail;
 		const xml = `
-			<testsuites errors="0" failures=${this.fail} name="${this.benchmark.config.name}" tests="${count}" hostname="${hostname()}">
+			<testsuites errors="0" failures="${this.fail}" name="${this.benchmark.config.name}" tests="${count}" hostname="${hostname()}">
 				${this.testsuites.join('\n')}
 			</testsuites>
 		`;
