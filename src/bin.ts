@@ -88,7 +88,7 @@ const builder: CommandBuilder<Options, Options> = (yargs: Argv<Options>) => {
 		.options('warn-exit', {
 			type: 'number',
 			describe: 'The exit code to use when the benchmark end with a warning',
-			default: 1
+			default: 0
 		})
 		.options('fail-exit', {
 			type: 'number',
