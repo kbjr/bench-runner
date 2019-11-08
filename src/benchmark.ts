@@ -82,9 +82,10 @@ export class Benchmark {
 			});
 		}
 
-		this.reporters.forEach((reporter) => {
-			reporter.end();
-		});
+		// Wait for all the reporters to finish writing
+		await Promise.all(
+			this.reporters.map((reporter) => reporter.end())
+		);
 
 		if (this.newProfile) {
 			this.newProfile.writeToFile(resolve(process.cwd(), this.config.profileOut));
