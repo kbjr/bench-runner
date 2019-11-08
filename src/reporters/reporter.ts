@@ -37,14 +37,12 @@ export abstract class Reporter {
 	}
 
 	protected _end() : Promise<void> {
-		return new Promise((resolve) => {
-			if (this.outStream === process.stdout) {
-				return this._write('\n');
-			}
+		if (this.outStream === process.stdout) {
+			return this._write('\n');
+		}
 
-			else {
-				this.outStream.end(() => resolve());
-			}
+		return new Promise((resolve) => {
+			this.outStream.end(() => resolve());
 		});
 	}
 }

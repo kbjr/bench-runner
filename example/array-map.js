@@ -12,7 +12,7 @@
 // 		largeArray.map((x) => x * 2);
 // 	}
 // });
-
+/*
 const { suite } = require('../build');
 
 const smallArray = Array.from({ length: 1000 }, (_, i) => i);
@@ -41,3 +41,4 @@ suite('Array.map', () => {
 		largeArray.map((x) => x * 2);
 	});
 });
+*/
