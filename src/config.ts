@@ -14,5 +14,5 @@ export interface Config {
 export type ReporterWithConfig = [ ReporterConstructor, ReporterConfig ];
 
 export interface ReporterConfig {
-	// 
+	out?: string;
 }

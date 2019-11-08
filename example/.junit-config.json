@@ -1,0 +1,9 @@
+{
+	"name": "Example Benchmark",
+	"files": "example/**/*.js",
+	"warnThreshold": 0.8,
+	"failThreshold": 0.5,
+	"reporters": [
+		["junit", { }]
+	]
+}

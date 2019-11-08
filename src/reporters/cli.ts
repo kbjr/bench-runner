@@ -20,9 +20,9 @@ export class CliReporter extends Reporter {
 	constructor(benchmark, config) {
 		super(benchmark, config);
 
-		console.log();
-		console.log('  ' + this.benchmark.config.name);
-		console.log('  ' + '='.repeat(this.benchmark.config.name.length));
+		this._write('\n');
+		this._write(`  ${this.benchmark.config.name}\n`);
+		this._write(`  ${'='.repeat(this.benchmark.config.name.length)}\n`);
 	}
 
 	write(result: SuiteResult) {
@@ -32,21 +32,17 @@ export class CliReporter extends Reporter {
 	}
 
 	end() : Promise<void> {
-		return new Promise((resolve) => {
-			console.log('\n  Benchmark Complete');
+		this._write(`\n  Benchmark Complete\n`);
 
-			if (this.config.colors) {
-				console.log(`  ${this.pass + green(' pass')}, ${this.warn + yellow(' warn')}, ${this.fail + red(' fail')}`);
-			}
+		if (this.config.colors) {
+			this._write(`  ${this.pass + green(' pass')}, ${this.warn + yellow(' warn')}, ${this.fail + red(' fail')}\n`);
+		}
 
-			else {
-				console.log(`  ${this.pass} pass, ${this.warn} warn, ${this.fail} fail`);
-			}
+		else {
+			this._write(`  ${this.pass} pass, ${this.warn} warn, ${this.fail} fail\n`);
+		}
 
-			// This just causes the promise to resolve once all things previously
-			// written to stdout have been flushed
-			process.stdout.write('\n', () => resolve());
-		});
+		return this._end();
 	}
 
 	protected writeColorized(result: SuiteResult) {
@@ -80,8 +76,8 @@ export class CliReporter extends Reporter {
 			}
 		}
 
-		console.log(`\n  Suite: ${result.name} (${pass + green(' pass')}, ${warn + yellow(' warn')}, ${fail + red(' fail')})`);
-		console.log(tests.join('\n'));
+		this._write(`\n  Suite: ${result.name} (${pass + green(' pass')}, ${warn + yellow(' warn')}, ${fail + red(' fail')})\n`);
+		this._write(`${tests.join('\n')}\n`);
 	}
 
 	protected writeNoColor(result: SuiteResult) {
@@ -115,7 +111,7 @@ export class CliReporter extends Reporter {
 			}
 		}
 
-		console.log(`\n  Suite: ${result.name} (${pass} pass, ${warn} warn, ${fail} fail)`);
-		console.log(tests.join('\n'));
+		this._write(`\n  Suite: ${result.name} (${pass} pass, ${warn} warn, ${fail} fail)\n`);
+		this._write(`${tests.join('\n')}\n`);
 	}
 }

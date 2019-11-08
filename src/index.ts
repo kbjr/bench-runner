@@ -4,6 +4,7 @@ import { nodeVersion, os, cpuList, cpuDesc, platformDesc } from './platform';
 import { CliReporter } from './reporters/cli';
 // import { HtmlReporter } from './reporters/html';
 // import { TextReporter } from './reporters/text';
+import { JunitReporter } from './reporters/junit';
 import { BeforeCallback, BeforeTestCallback, GenerateTestDataCallback, TestCallback, GenerateTestDataArrayCallback } from './suite';
 
 export { Benchmark, SuiteTests } from './benchmark';
@@ -16,11 +17,13 @@ export { Reporter, ReporterConstructor } from './reporters/reporter';
 export { CliReporter } from './reporters/cli';
 // export { HtmlReporter } from './reporters/html';
 // export { TextReporter } from './reporters/text';
+export { JunitReporter } from './reporters/junit';
 
 export const reporters = {
 	cli: CliReporter,
 	// html: HtmlReporter,
-	// text: TextReporter
+	// text: TextReporter,
+	junit: JunitReporter
 };
 
 // Platform Details

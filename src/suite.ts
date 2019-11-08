@@ -16,6 +16,7 @@ export interface TestResult {
 	hz: Stat;
 	expectation: Stat;
 	expectationVariance: Stat;
+	time: Stat;
 	outcome: BenchmarkOutcome;
 	variance: Stat;
 	runsSampled: number;
@@ -23,6 +24,7 @@ export interface TestResult {
 
 export interface SuiteResult {
 	name: string;
+	time: Stat;
 	tests: TestResult[];
 	outcome: BenchmarkOutcome;
 }
@@ -100,10 +102,14 @@ export class Suite {
 	}
 
 	run() : Promise<SuiteResult> {
+		const suiteStart = Date.now();
+		let previousStart = suiteStart;
+
 		return new Promise(async (resolve) => {
 			const result: SuiteResult = {
 				name: this.name,
 				tests: [ ],
+				time: null,
 				outcome: null
 			};
 			
@@ -134,10 +140,12 @@ export class Suite {
 					hz: formatHz(event.target.hz),
 					expectation: formatHz(expectation),
 					expectationVariance: formatExpectationVariance(variance),
+					time: formatMs(Date.now() - previousStart),
 					outcome: null,
 					variance: formatVariance(event.target.stats.rme),
 					runsSampled: event.target.stats.sample.length
 				};
+
 
 				const warnThreshold = expectation * this.config.warnThreshold;
 				const failThreshold = expectation * this.config.failThreshold;
@@ -156,6 +164,7 @@ export class Suite {
 					hasFail = true;
 				}
 
+				previousStart = Date.now();
 				result.tests.push(testResult);
 			});
 
@@ -171,6 +180,8 @@ export class Suite {
 				else {
 					result.outcome = BenchmarkOutcome.Pass;
 				}
+
+				result.time = formatMs(Date.now() - suiteStart);
 
 				resolve(result);
 			});
@@ -191,6 +202,13 @@ const formatVariance = (raw: number) : Stat => {
 	return {
 		raw: raw,
 		formatted: `+/-${raw.toPrecision(3)}%`
+	};
+};
+
+const formatMs = (raw: number) : Stat => {
+	return {
+		raw: raw,
+		formatted: `${raw}ms`
 	};
 };
 

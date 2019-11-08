@@ -7,6 +7,7 @@ import {
 	Benchmark,
 	Suite,
 	CliReporter,
+	JunitReporter,
 	Config,
 	ReporterConstructor,
 	SuiteTests,
@@ -24,13 +25,18 @@ interface Options {
 	warnThreshold?: number;
 	failThreshold?: number;
 	reporters?: string[];
+	reportOut?: string;
 	profile?: string;
 	profileOut?: string;
 	require?: string[];
+	passExit: number;
+	warnExit: number;
+	failExit: number;
 }
 
 const builtInReporters = {
-	cli: CliReporter
+	cli: CliReporter,
+	junit: JunitReporter
 };
 
 const builder: CommandBuilder<Options, Options> = (yargs: Argv<Options>) => {
@@ -73,6 +79,21 @@ const builder: CommandBuilder<Options, Options> = (yargs: Argv<Options>) => {
 		.option('profile-out', {
 			type: 'string',
 			describe: 'If set, will additionally output a new benchmark profile to this file'
+		})
+		.options('pass-exit', {
+			type: 'number',
+			describe: 'The exit code to use when the benchmark passes',
+			default: 0
+		})
+		.options('warn-exit', {
+			type: 'number',
+			describe: 'The exit code to use when the benchmark end with a warning',
+			default: 1
+		})
+		.options('fail-exit', {
+			type: 'number',
+			describe: 'The exit code to use when the benchmark fails',
+			default: 1
 		});
 };
 
@@ -155,12 +176,19 @@ const handler = async (args: Arguments<Options>) => {
 
 	await benchmark.run();
 
-	if (benchmark.outcome === BenchmarkOutcome.Fail) {
-		process.exit(1);
-	}
+	switch (benchmark.outcome) {
+		case BenchmarkOutcome.Fail:
+			process.exit(args.failExit);
+			break;
 
-	else {
-		process.exit(0);
+		case BenchmarkOutcome.Warn:
+			process.exit(args.warnExit);
+			break;
+
+		case BenchmarkOutcome.Pass:
+		case BenchmarkOutcome.None:
+			process.exit(args.passExit);
+			break;
 	}
 };
 

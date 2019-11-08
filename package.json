@@ -5,7 +5,8 @@
   "main": "build/index.js",
   "scripts": {
     "build": "tsc --build tsconfig.json",
-    "example": "node ./build/bin.js run --config ./example/.bench-config.json"
+    "example:cli": "node ./build/bin.js run --config ./example/.cli-config.json",
+    "example:junit": "node ./build/bin.js run --config ./example/.junit-config.json"
   },
   "bin": {
     "bench": "bin/bench"
